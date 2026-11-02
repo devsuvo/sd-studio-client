@@ -52,7 +52,7 @@ export default function Footer() {
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`StudioSpace on ${s.label}`}
+                aria-label={`SD Studio on ${s.label}`}
                 className="btn btn-circle btn-ghost btn-sm border border-base-300 hover:border-primary hover:text-primary"
               >
                 <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden>
@@ -100,9 +100,9 @@ export default function Footer() {
 
       <div className="border-t border-base-300">
         <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-base-content/60 sm:flex-row">
-          <p>© {new Date().getFullYear()} StudioSpace. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SD Studio. All rights reserved.</p>
           <p>
-            By using StudioSpace you agree to our{" "}
+            By using SD Studio you agree to our{" "}
             <Link href="/terms" className="link link-hover">
               Terms of Service
             </Link>

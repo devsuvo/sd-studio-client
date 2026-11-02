@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk" });
 
 export const metadata: Metadata = {
-  title: { default: "StudioSpace — Book creative studios by the hour", template: "%s · StudioSpace" },
+  title: { default: "SD Studio — Book creative studios by the hour", template: "%s · SD Studio" },
   description:
     "Find and book photography cyc walls, sound stages, podcast lounges, recording suites and art workshops from local hosts.",
 };

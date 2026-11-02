@@ -25,7 +25,7 @@ export default function MyListingsPage() {
       cancelText: "Keep it",
       message: (
         <>
-          <strong>{studio.title}</strong> will be permanently removed from StudioSpace. This can&apos;t be undone.
+          <strong>{studio.title}</strong> will be permanently removed from SD Studio. This can&apos;t be undone.
         </>
       ),
     });
@@ -68,7 +68,7 @@ export default function MyListingsPage() {
     <div>
       <PageHeader
         title="My Studio Listings"
-        subtitle="Spaces you host on StudioSpace."
+        subtitle="Spaces you host on SD Studio."
         action={
           <Link href="/add-studio" className="btn btn-primary">
             <Plus className="size-4" /> Add New Studio

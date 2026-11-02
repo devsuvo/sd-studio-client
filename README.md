@@ -1,9 +1,9 @@
-# StudioSpace — Peer-to-Peer Creative Workspace & Production Studio Sharing
+# SD Studio — Peer-to-Peer Creative Workspace & Production Studio Sharing
 
-**Live site:** https://your-studiospace.vercel.app  <!-- replace with your deployed client URL -->
-**API:** https://your-studiospace-api.vercel.app  <!-- replace with your deployed server URL -->
+**Live site:** https://your-sd-studio.vercel.app  <!-- replace with your deployed client URL -->
+**API:** https://your-sd-studio-api.vercel.app  <!-- replace with your deployed server URL -->
 
-StudioSpace is a marketplace where photographers, filmmakers, podcasters, musicians and artists book creative spaces by the hour. Hosts list cyc walls, sound stages, podcast lounges, music suites and art workshops; creators search, check live hourly availability and reserve slots with transparent pricing.
+SD Studio is a marketplace where photographers, filmmakers, podcasters, musicians and artists book creative spaces by the hour. Hosts list cyc walls, sound stages, podcast lounges, music suites and art workshops; creators search, check live hourly availability and reserve slots with transparent pricing.
 
 ## Features
 

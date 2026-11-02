@@ -33,7 +33,7 @@ export default function TermsPage() {
   return (
     <div className="container-page max-w-3xl py-12">
       <h1 className="text-3xl font-bold sm:text-4xl">Terms of Service</h1>
-      <p className="mt-3 text-base-content/70">The short version of how StudioSpace works for hosts and creators.</p>
+      <p className="mt-3 text-base-content/70">The short version of how SD Studio works for hosts and creators.</p>
       <div className="mt-10 space-y-8">
         {SECTIONS.map((s) => (
           <section key={s.title}>

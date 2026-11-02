@@ -28,10 +28,10 @@ export default function AboutPage() {
     <div className="container-page space-y-20 py-12">
       <section className="grid items-center gap-10 lg:grid-cols-2">
         <div>
-          <h1 className="text-3xl font-bold sm:text-4xl">About StudioSpace</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">About SD Studio</h1>
           <p className="mt-5 text-lg text-base-content/75">
             Many great studios sit empty for hours each day, while independent creators struggle to find a space that
-            fits their shoot and their budget. StudioSpace connects the two.
+            fits their shoot and their budget. SD Studio connects the two.
           </p>
           <p className="mt-4 text-base-content/75">
             Hosts list cyc walls, sound stages, podcast lounges, recording suites and art workshops. Creators find the

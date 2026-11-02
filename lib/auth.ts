@@ -9,7 +9,7 @@ const client = new MongoClient(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:2
 const db = client.db(process.env.DB_NAME ?? "studiospace");
 
 export const auth = betterAuth({
-  appName: "StudioSpace",
+  appName: "SD Studio",
   database: mongodbAdapter(db),
   emailAndPassword: {
     enabled: true,

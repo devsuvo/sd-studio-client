@@ -10,7 +10,7 @@ export async function downloadInvoice(booking: Booking) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const M = 48;
-  const invoiceNo = `SS-${booking._id.slice(-8).toUpperCase()}`;
+  const invoiceNo = `SD-${booking._id.slice(-8).toUpperCase()}`;
 
   // Header band
   doc.setFillColor(232, 85, 59);
@@ -18,7 +18,7 @@ export async function downloadInvoice(booking: Booking) {
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(24);
-  doc.text("StudioSpace", M, 58);
+  doc.text("SD Studio", M, 58);
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
   doc.text("Booking receipt", W - M, 50, { align: "right" });
@@ -90,7 +90,7 @@ export async function downloadInvoice(booking: Booking) {
     760,
     { maxWidth: W - M * 2 },
   );
-  doc.text("Thank you for creating with StudioSpace.", M, 790);
+  doc.text("Thank you for creating with SD Studio.", M, 790);
 
-  doc.save(`StudioSpace-receipt-${invoiceNo}.pdf`);
+  doc.save(`SD-Studio-receipt-${invoiceNo}.pdf`);
 }

@@ -85,7 +85,7 @@ export default function LoginForm() {
               type="button"
               className="link link-hover text-xs text-primary"
               onClick={() =>
-                toast.info("Password reset is coming soon. For now, sign in with Google or contact support@studiospace.app.")
+                toast.info("Password reset is coming soon. For now, sign in with Google or contact support@sdstudio.dev.")
               }
             >
               Forgot password?
