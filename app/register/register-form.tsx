@@ -3,11 +3,11 @@
 import { Check, ImageIcon, Mail, User, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import GoogleButton from "@/components/google-button";
 import PasswordInput from "@/components/password-input";
-import { signUp, useSession } from "@/lib/auth-client";
+import { signOut, signUp, useSession } from "@/lib/auth-client";
 import { safeRedirect } from "../login/login-form";
 
 const RULES = [
@@ -26,9 +26,11 @@ export default function RegisterForm() {
   const [form, setForm] = useState<Record<Field, string>>({ name: "", email: "", image: "", password: "" });
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [submitting, setSubmitting] = useState(false);
+  // Set while we sign the brand-new account back out, so the "already logged in" redirect doesn't fire.
+  const registering = useRef(false);
 
   useEffect(() => {
-    if (!isPending && session) router.replace(redirect);
+    if (!isPending && session && !registering.current) router.replace(redirect);
   }, [isPending, session, redirect, router]);
 
   const set = (key: Field) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,14 +59,16 @@ export default function RegisterForm() {
     }
 
     setSubmitting(true);
+    registering.current = true;
     const { error } = await signUp.email({
       name: form.name.trim(),
       email: form.email.trim(),
       password: form.password,
       image: form.image.trim() || undefined,
     });
-    setSubmitting(false);
     if (error) {
+      registering.current = false;
+      setSubmitting(false);
       const message =
         error.code === "USER_ALREADY_EXISTS" || error.status === 422
           ? "An account with this email already exists. Try logging in."
@@ -73,6 +77,8 @@ export default function RegisterForm() {
       toast.error(message);
       return;
     }
+    await signOut();
+    setSubmitting(false);
     toast.success("Account created! Please log in to continue.");
     const next = new URLSearchParams({ email: form.email.trim() });
     if (redirect !== "/") next.set("redirect", redirect);

@@ -14,8 +14,9 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 6,
-    // Registration sends people to the login page instead of signing them in.
-    autoSignIn: false,
+    // Kept on so duplicate emails return a real error. The register page signs the new
+    // user straight back out and sends them to Login, as the spec asks.
+    autoSignIn: true,
   },
   socialProviders:
     process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
