@@ -14,17 +14,17 @@ export default function DashboardOverview() {
   const firstName = session?.user.name.split(" ")[0] ?? "there";
 
   const cards = [
-    { label: "Upcoming sessions", value: data?.upcoming, icon: CalendarClock, href: "/dashboard/bookings" },
-    { label: "Total bookings", value: data?.bookings, icon: CalendarCheck, href: "/dashboard/bookings" },
-    { label: "Confirmed spend", value: data && formatMoney(data.spent), icon: DollarSign, href: "/dashboard/bookings" },
-    { label: "Studios listed", value: data?.listings, icon: Warehouse, href: "/dashboard/listings" },
+    { label: "Upcoming sessions", value: data?.upcoming, icon: CalendarClock, href: "/my-bookings" },
+    { label: "Total bookings", value: data?.bookings, icon: CalendarCheck, href: "/my-bookings" },
+    { label: "Confirmed spend", value: data && formatMoney(data.spent), icon: DollarSign, href: "/my-bookings" },
+    { label: "Studios listed", value: data?.listings, icon: Warehouse, href: "/my-listings" },
     { label: "Requests to review", value: data?.pendingRequests, icon: Inbox, href: "/dashboard/reservations" },
     { label: "Confirmed earnings", value: data && formatMoney(data.earnings), icon: Wallet, href: "/dashboard/reservations" },
   ];
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Hi, {firstName}</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">Hi, {firstName}</h1>
       <p className="mt-1 text-base-content/70">Here&apos;s what&apos;s happening with your bookings and studios.</p>
 
       {error && (
@@ -78,7 +78,7 @@ export default function DashboardOverview() {
         <div className="rounded-box bg-secondary/10 p-6">
           <h2 className="text-lg font-semibold">Have a space to share?</h2>
           <p className="mt-1 text-sm text-base-content/70">List it and start taking requests today.</p>
-          <Link href="/dashboard/listings/new" className="btn btn-secondary btn-sm mt-4">
+          <Link href="/add-studio" className="btn btn-secondary btn-sm mt-4">
             <Warehouse className="size-4" /> List a studio
           </Link>
         </div>

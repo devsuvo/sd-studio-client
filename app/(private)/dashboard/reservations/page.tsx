@@ -61,7 +61,7 @@ export default function ReservationsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Reservations</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">Reservations</h1>
       <p className="mt-1 text-base-content/70">Requests from creators who want to use your studios.</p>
 
       <div role="tablist" className="tabs tabs-box mt-6 w-fit">

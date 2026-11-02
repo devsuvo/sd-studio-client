@@ -35,7 +35,7 @@ export default function HowItWorksPage() {
   return (
     <div className="container-page space-y-20 py-12">
       <header className="max-w-2xl">
-        <h1 className="text-4xl font-bold sm:text-5xl">How StudioSpace works</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">How StudioSpace works</h1>
         <p className="mt-4 text-lg text-base-content/70">
           From search to wrap in four steps for creators, and three for hosts.
         </p>
@@ -83,7 +83,7 @@ export default function HowItWorksPage() {
         <Link href="/studios" className="btn btn-primary">
           Explore Studios
         </Link>
-        <Link href="/dashboard/listings/new" className="btn btn-outline">
+        <Link href="/add-studio" className="btn btn-outline">
           Host Your Space
         </Link>
       </div>

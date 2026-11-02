@@ -79,7 +79,7 @@ export function FeaturedStudios() {
       {!loading && data?.length === 0 && (
         <p className="col-span-full text-base-content/70">
           No studios yet.{" "}
-          <Link href="/dashboard/listings/new" className="link link-primary">
+          <Link href="/add-studio" className="link link-primary">
             Be the first to list one.
           </Link>
         </p>

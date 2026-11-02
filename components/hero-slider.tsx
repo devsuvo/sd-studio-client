@@ -67,7 +67,7 @@ export default function HeroSlider() {
                       Explore Studios <ArrowRight className="size-5" />
                     </Link>
                     <Link
-                      href="/dashboard/listings/new"
+                      href="/add-studio"
                       className="btn btn-lg btn-outline border-white/70 text-white hover:border-white hover:bg-white hover:text-black"
                     >
                       <Warehouse className="size-5" /> Host Your Space

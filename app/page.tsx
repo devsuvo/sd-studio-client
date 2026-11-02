@@ -100,7 +100,7 @@ export default function HomePage() {
               List it in a few minutes, set your own hours and rate, and approve each request yourself.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/dashboard/listings/new" className="btn btn-primary">
+              <Link href="/add-studio" className="btn btn-primary">
                 Host Your Space
               </Link>
               <Link href="/studios" className="btn btn-outline border-neutral-content/40 text-neutral-content">

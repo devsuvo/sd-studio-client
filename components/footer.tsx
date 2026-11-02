@@ -8,7 +8,7 @@ const QUICK_LINKS = [
   { href: "/studios", label: "Explore Studios" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/about", label: "About Us" },
-  { href: "/dashboard/listings/new", label: "List your studio" },
+  { href: "/add-studio", label: "List your studio" },
 ];
 
 // Brand marks drawn inline (lucide no longer ships brand icons). X uses the current logo, not the bird.
