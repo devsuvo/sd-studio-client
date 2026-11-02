@@ -10,6 +10,15 @@ export const CATEGORIES: { name: Category; icon: LucideIcon; blurb: string }[] =
   { name: "Dance & Rehearsal", icon: Footprints, blurb: "Sprung floors and mirror walls" },
 ];
 
+/** Friendly names for the home page category cards; each links to /studios with that category selected. */
+export const HOME_CATEGORIES: { label: string; category: Category; icon: LucideIcon; blurb: string }[] = [
+  { label: "Photo Studios", category: "Photography", icon: Camera, blurb: "Cyc walls, daylight lofts and portrait sets" },
+  { label: "Sound Stages", category: "Film & Video", icon: Clapperboard, blurb: "Blackout stages, green screens and grids" },
+  { label: "Podcast Rooms", category: "Podcast", icon: Mic, blurb: "Treated rooms with multi-cam setups" },
+  { label: "Music Suites", category: "Music Recording", icon: Music, blurb: "Tracking rooms, vocal booths and mix suites" },
+  { label: "Art Workshops", category: "Art Workshop", icon: Palette, blurb: "Easels, wheels, kilns and natural light" },
+];
+
 export const AMENITY_SUGGESTIONS = [
   "Wi-Fi",
   "Air conditioning",

@@ -1,57 +1,12 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import StudioCard, { StudioCardSkeleton } from "@/components/studio-card";
 import { ErrorState } from "@/components/ui";
 import { useFetch } from "@/hooks/use-fetch";
-import { CATEGORIES } from "@/lib/constants";
+import { HOME_CATEGORIES } from "@/lib/constants";
 import type { Stats, Studio } from "@/lib/types";
-
-export function HeroSearch() {
-  const router = useRouter();
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (search.trim()) params.set("search", search.trim());
-    if (category) params.set("category", category);
-    router.push(`/studios${params.size ? `?${params}` : ""}`);
-  };
-
-  return (
-    <form
-      onSubmit={submit}
-      className="mt-8 flex flex-col gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 shadow-lg sm:flex-row"
-    >
-      <label className="input input-ghost grow border-0 focus-within:outline-none">
-        <Search className="size-4 opacity-60" />
-        <input
-          className="grow"
-          placeholder="Try “cyc wall”, “Dhaka” or “podcast”"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </label>
-      <select
-        className="select select-ghost sm:w-48"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        aria-label="Category"
-      >
-        <option value="">All categories</option>
-        {CATEGORIES.map((c) => (
-          <option key={c.name}>{c.name}</option>
-        ))}
-      </select>
-      <button className="btn btn-primary">Search</button>
-    </form>
-  );
-}
 
 export function StatsStrip() {
   const { data } = useFetch<Stats>("/api/stats");
@@ -62,7 +17,7 @@ export function StatsStrip() {
     { label: "Active bookings", value: data?.bookings },
   ];
   return (
-    <section className="border-y border-base-300 bg-base-100">
+    <section className="border-b border-base-300 bg-base-100">
       <div className="container-page grid grid-cols-2 divide-base-300 py-8 md:grid-cols-4 md:divide-x">
         {items.map((s) => (
           <div key={s.label} className="py-2 text-center">
@@ -80,27 +35,24 @@ export function StatsStrip() {
 export function CategoryGrid() {
   const { data } = useFetch<Stats>("/api/stats");
   return (
-    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {CATEGORIES.map(({ name, icon: Icon, blurb }) => {
-        const count = data?.categories[name] ?? 0;
+    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      {HOME_CATEGORIES.map(({ label, category, icon: Icon, blurb }) => {
+        const count = data?.categories[category] ?? 0;
         return (
           <Link
-            key={name}
-            href={`/studios?category=${encodeURIComponent(name)}`}
-            className="group flex items-center gap-4 rounded-box border border-base-300 p-5 transition hover:border-primary hover:bg-primary/5"
+            key={label}
+            href={`/studios?category=${encodeURIComponent(category)}`}
+            className="group flex flex-col rounded-box border border-base-300 bg-base-100 p-5 transition hover:-translate-y-1 hover:border-primary hover:shadow-lg"
           >
-            <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-content">
+            <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-content">
               <Icon className="size-6" />
             </span>
-            <div className="min-w-0">
-              <p className="font-semibold">{name}</p>
-              <p className="truncate text-sm text-base-content/65">{blurb}</p>
-              {data && (
-                <p className="mt-1 text-xs text-base-content/50">
-                  {count} space{count === 1 ? "" : "s"}
-                </p>
-              )}
-            </div>
+            <p className="mt-4 font-semibold">{label}</p>
+            <p className="mt-1 flex-1 text-sm text-base-content/65">{blurb}</p>
+            <p className="mt-3 flex items-center justify-between text-xs text-base-content/55">
+              {data ? `${count} space${count === 1 ? "" : "s"}` : <span className="skeleton h-3 w-12" />}
+              <ArrowRight className="size-4 transition group-hover:translate-x-1 group-hover:text-primary" />
+            </p>
           </Link>
         );
       })}

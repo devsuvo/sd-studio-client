@@ -1,19 +1,8 @@
-import { CalendarCheck, Search, ShieldCheck, Sparkles, Upload, Wallet, ClipboardCheck } from "lucide-react";
 import Link from "next/link";
-import StudioImage from "@/components/studio-image";
-import { CategoryGrid, FeaturedStudios, HeroSearch, StatsStrip } from "./home-sections";
-
-const GUEST_STEPS = [
-  { icon: Search, title: "Find your space", text: "Filter by category, city, budget and crew size to shortlist studios that fit the shoot." },
-  { icon: CalendarCheck, title: "Pick open hours", text: "See booked hours for any date, choose a start and end time, and check the full price." },
-  { icon: Sparkles, title: "Create", text: "Your host confirms the request and you show up to a space that's ready to go." },
-];
-
-const HOST_STEPS = [
-  { icon: Upload, title: "List in minutes", text: "Add photos, gear, opening hours and an hourly rate. Your listing goes live right away." },
-  { icon: ClipboardCheck, title: "Approve requests", text: "Every request lands in your reservations inbox. Confirm or decline in one click." },
-  { icon: Wallet, title: "Earn from idle hours", text: "Track confirmed earnings from your dashboard and keep your calendar full." },
-];
+import BookingSteps from "@/components/booking-steps";
+import HeroSlider from "@/components/hero-slider";
+import HostGuarantee from "@/components/host-guarantee";
+import { CategoryGrid, FeaturedStudios, StatsStrip } from "./home-sections";
 
 const TESTIMONIALS = [
   {
@@ -39,100 +28,54 @@ const TESTIMONIALS = [
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative isolate overflow-hidden">
-        <div className="absolute -left-32 -top-32 -z-10 size-96 rounded-full bg-primary/15 blur-3xl" />
-        <div className="absolute -bottom-40 right-0 -z-10 size-96 rounded-full bg-secondary/15 blur-3xl" />
-        <div className="container-page grid items-center gap-12 py-14 lg:grid-cols-[1.1fr_1fr] lg:py-24">
-          <div>
-            <span className="badge badge-primary badge-soft gap-1">
-              <ShieldCheck className="size-3.5" /> Hosts confirm every booking
-            </span>
-            <h1 className="mt-5 text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
-              Book the room your next project <span className="text-primary">deserves</span>.
-            </h1>
-            <p className="mt-5 max-w-xl text-lg text-base-content/75">
-              Cyc walls, sound stages, podcast lounges, recording suites and art workshops, rented by the hour from
-              the creators who built them.
-            </p>
-            <HeroSearch />
-          </div>
-          <div className="relative hidden h-[460px] lg:block">
-            <StudioImage
-              src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80"
-              alt="Photographer's camera in a studio"
-              className="absolute right-0 top-0 h-[78%] w-[72%] rounded-3xl shadow-2xl"
-            />
-            <StudioImage
-              src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=700&q=80"
-              alt="Podcast microphone"
-              className="absolute bottom-0 left-0 h-[52%] w-[50%] rounded-3xl border-8 border-base-100 shadow-2xl"
-            />
-            <div className="absolute bottom-10 right-4 rounded-2xl border border-base-300 bg-base-100 p-4 shadow-xl">
-              <p className="text-xs text-base-content/60">Pay only for the hours you use</p>
-              <p className="font-semibold">Rate + cleaning + 5% fee, shown upfront</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <HeroSlider />
       <StatsStrip />
 
-      {/* Categories */}
+      {/* Featured studios (top rated, limit 6) */}
       <section className="container-page py-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-bold">Browse by craft</h2>
-            <p className="mt-2 text-base-content/70">Every space is set up for a specific kind of work.</p>
+            <h2 className="text-3xl font-bold">Featured studios</h2>
+            <p className="mt-2 text-base-content/70">Top-rated spaces creators keep coming back to.</p>
           </div>
           <Link href="/studios" className="btn btn-ghost">
             View all studios →
           </Link>
         </div>
-        <CategoryGrid />
+        <FeaturedStudios />
       </section>
 
-      {/* Featured */}
+      {/* Categories */}
       <section className="bg-base-200 py-16">
         <div className="container-page">
-          <h2 className="text-3xl font-bold">Top rated studios</h2>
-          <p className="mt-2 text-base-content/70">Spaces creators keep coming back to.</p>
-          <FeaturedStudios />
+          <h2 className="text-3xl font-bold">Browse by studio category</h2>
+          <p className="mt-2 text-base-content/70">Every space is set up for a specific kind of work.</p>
+          <CategoryGrid />
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How booking works */}
       <section className="container-page py-16">
-        <h2 className="text-center text-3xl font-bold">How SD Studio works</h2>
-        <div className="mt-10 grid gap-10 lg:grid-cols-2">
-          {[
-            { heading: "For creators", steps: GUEST_STEPS, tone: "text-primary bg-primary/10" },
-            { heading: "For hosts", steps: HOST_STEPS, tone: "text-secondary bg-secondary/10" },
-          ].map((group) => (
-            <div key={group.heading} className="rounded-box border border-base-300 p-6 sm:p-8">
-              <h3 className="text-xl font-semibold">{group.heading}</h3>
-              <ol className="mt-6 space-y-6">
-                {group.steps.map((s, i) => (
-                  <li key={s.title} className="flex gap-4">
-                    <span className={`grid size-11 shrink-0 place-items-center rounded-xl ${group.tone}`}>
-                      <s.icon className="size-5" />
-                    </span>
-                    <div>
-                      <p className="font-semibold">
-                        {i + 1}. {s.title}
-                      </p>
-                      <p className="mt-1 text-sm text-base-content/70">{s.text}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          ))}
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold">How booking works</h2>
+          <p className="mt-2 text-base-content/70">From search to set in four steps.</p>
+        </div>
+        <BookingSteps />
+      </section>
+
+      {/* Host guarantee & creator support */}
+      <section className="bg-base-200 py-16">
+        <div className="container-page">
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-bold">Host guarantee & creator support</h2>
+            <p className="mt-2 text-base-content/70">Protection and help on both sides of every booking.</p>
+          </div>
+          <HostGuarantee />
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="container-page pb-16">
+      <section className="container-page py-16">
         <h2 className="text-3xl font-bold">What creators say</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {TESTIMONIALS.map((t) => (
@@ -158,10 +101,10 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/dashboard/listings/new" className="btn btn-primary">
-                List your studio
+                Host Your Space
               </Link>
               <Link href="/studios" className="btn btn-outline border-neutral-content/40 text-neutral-content">
-                See other listings
+                Explore Studios
               </Link>
             </div>
           </div>
