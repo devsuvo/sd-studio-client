@@ -3,6 +3,7 @@
 import { CalendarCheck, Heart, LayoutDashboard, LogOut, Menu, PlusCircle, Warehouse } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useConfirm } from "./confirm-dialog";
@@ -31,6 +32,14 @@ export default function Navbar() {
   const confirm = useConfirm();
   const { data: session, isPending } = useSession();
   const user = session?.user;
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`));
 
@@ -49,7 +58,11 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-base-300/70 bg-base-100/85 backdrop-blur">
+    <header
+      className={`sticky top-0 z-40 border-b backdrop-blur-xl transition-[background-color,box-shadow,border-color] duration-300 ${
+        scrolled ? "border-base-300/80 bg-base-100/80 shadow-[0_8px_30px_-12px_rgb(0_0_0/0.18)]" : "border-transparent bg-base-100/60"
+      }`}
+    >
       <nav className="container-page navbar min-h-16 px-0">
         <div className="navbar-start gap-1">
           <div className="dropdown lg:hidden">

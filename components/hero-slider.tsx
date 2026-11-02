@@ -46,20 +46,25 @@ export default function HeroSlider() {
         navigation
         pagination={{ clickable: true }}
         keyboard={{ enabled: true }}
-        className="h-[560px] sm:h-[620px]"
+        className="h-[580px] sm:h-[660px]"
       >
         {SLIDES.map((s, i) => (
           <SwiperSlide key={s.title}>
             <div className="relative size-full">
-              <StudioImage src={s.image} alt={s.eyebrow} className="absolute inset-0 size-full" />
+              <div className="absolute inset-0 overflow-hidden">
+                <StudioImage src={s.image} alt={s.eyebrow} className="hero-bg size-full" />
+              </div>
               <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/10" />
+              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/50 to-transparent" />
               <div className="container-page relative flex h-full items-center">
-                <div className="max-w-2xl px-2 text-white sm:px-8">
-                  <span className="badge badge-primary">{s.eyebrow}</span>
+                <div className="hero-anim max-w-2xl px-2 text-white sm:px-8">
+                  <div>
+                    <span className="badge badge-primary badge-lg border-0 shadow-lg">{s.eyebrow}</span>
+                  </div>
                   {i === 0 ? (
-                    <h1 className="mt-5 text-4xl font-bold leading-[1.05] sm:text-6xl">{s.title}</h1>
+                    <h1 className="mt-5 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">{s.title}</h1>
                   ) : (
-                    <h2 className="mt-5 text-4xl font-bold leading-[1.05] sm:text-6xl">{s.title}</h2>
+                    <h2 className="mt-5 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">{s.title}</h2>
                   )}
                   <p className="mt-5 max-w-xl text-lg text-white/85">{s.text}</p>
                   <div className="mt-8 flex flex-wrap gap-3">
