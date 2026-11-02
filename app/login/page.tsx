@@ -4,11 +4,11 @@ import AuthShell from "@/components/auth-shell";
 import { Spinner } from "@/components/ui";
 import LoginForm from "./login-form";
 
-export const metadata: Metadata = { title: "Log in" };
+export const metadata: Metadata = { title: "Login" };
 
 export default function LoginPage() {
   return (
-    <AuthShell title="Welcome back" subtitle="Log in to book studios and manage your listings.">
+    <AuthShell title="Login" subtitle="Welcome back! Log in to book studios and manage your listings.">
       <Suspense fallback={<Spinner />}>
         <LoginForm />
       </Suspense>

@@ -5,40 +5,56 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import GoogleButton from "@/components/google-button";
 import PasswordInput from "@/components/password-input";
-import { clearTokenCache } from "@/lib/api";
 import { signUp, useSession } from "@/lib/auth-client";
 import { safeRedirect } from "../login/login-form";
 
 const RULES = [
-  { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
   { label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
   { label: "One lowercase letter", test: (p: string) => /[a-z]/.test(p) },
-  { label: "One number", test: (p: string) => /\d/.test(p) },
+  { label: "At least 6 characters", test: (p: string) => p.length >= 6 },
 ];
+
+type Field = "name" | "email" | "image" | "password";
 
 export default function RegisterForm() {
   const router = useRouter();
   const params = useSearchParams();
   const redirect = safeRedirect(params.get("redirect"));
   const { data: session, isPending } = useSession();
-  const [form, setForm] = useState({ name: "", email: "", image: "", password: "" });
+  const [form, setForm] = useState<Record<Field, string>>({ name: "", email: "", image: "", password: "" });
+  const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isPending && session) router.replace(redirect);
   }, [isPending, session, redirect, router]);
 
-  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set = (key: Field) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
+    setErrors((er) => ({ ...er, [key]: undefined }));
+  };
+
+  const validate = () => {
+    const next: Partial<Record<Field, string>> = {};
+    if (form.name.trim().length < 2) next.name = "Please enter your name.";
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) next.email = "Please enter a valid email address.";
+    if (form.image.trim() && !/^https?:\/\/\S+$/.test(form.image.trim())) next.image = "Photo URL must start with http:// or https://";
+    const failed = RULES.filter((r) => !r.test(form.password));
+    if (failed.length) next.password = `Password needs: ${failed.map((r) => r.label.toLowerCase()).join(", ")}.`;
+    return next;
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.name.trim().length < 2) return toast.error("Please enter your full name.");
-    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) return toast.error("Please enter a valid email address.");
-    if (form.image && !/^https?:\/\/\S+$/.test(form.image.trim())) return toast.error("Photo URL must start with http:// or https://");
-    const failed = RULES.find((r) => !r.test(form.password));
-    if (failed) return toast.error(`Password needs: ${failed.label.toLowerCase()}.`);
+    const found = validate();
+    setErrors(found);
+    const first = Object.values(found)[0];
+    if (first) {
+      toast.error(first);
+      return; // never register with invalid input
+    }
 
     setSubmitting(true);
     const { error } = await signUp.email({
@@ -49,78 +65,98 @@ export default function RegisterForm() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message ?? "We couldn't create your account. Please try again.");
+      const message =
+        error.code === "USER_ALREADY_EXISTS" || error.status === 422
+          ? "An account with this email already exists. Try logging in."
+          : (error.message ?? "We couldn't create your account. Please try again.");
+      setErrors({ email: message });
+      toast.error(message);
       return;
     }
-    clearTokenCache();
-    toast.success("Account created. Welcome to SD Studio!");
-    router.replace(redirect);
-    router.refresh();
+    toast.success("Account created! Please log in to continue.");
+    const next = new URLSearchParams({ email: form.email.trim() });
+    if (redirect !== "/") next.set("redirect", redirect);
+    router.push(`/login?${next}`);
   };
 
-  return (
-    <form onSubmit={submit} className="space-y-3" noValidate>
-      <fieldset className="fieldset">
-        <legend className="fieldset-legend">Full name</legend>
-        <label className="input w-full">
-          <User className="size-4 opacity-60" />
-          <input className="grow" placeholder="Your name" autoComplete="name" value={form.name} onChange={set("name")} />
-        </label>
-      </fieldset>
-      <fieldset className="fieldset">
-        <legend className="fieldset-legend">Email</legend>
-        <label className="input w-full">
-          <Mail className="size-4 opacity-60" />
-          <input
-            className="grow"
-            type="email"
-            placeholder="you@example.com"
-            autoComplete="email"
-            value={form.email}
-            onChange={set("email")}
-          />
-        </label>
-      </fieldset>
-      <fieldset className="fieldset">
-        <legend className="fieldset-legend">
-          Photo URL <span className="font-normal text-base-content/60">(optional)</span>
-        </legend>
-        <label className="input w-full">
-          <ImageIcon className="size-4 opacity-60" />
-          <input className="grow" type="url" placeholder="https://…" value={form.image} onChange={set("image")} />
-        </label>
-      </fieldset>
-      <fieldset className="fieldset">
-        <legend className="fieldset-legend">Password</legend>
-        <PasswordInput
-          placeholder="Create a password"
-          autoComplete="new-password"
-          value={form.password}
-          onChange={set("password")}
-        />
-        <ul className="mt-1 grid grid-cols-2 gap-1 text-xs">
-          {RULES.map((r) => {
-            const ok = r.test(form.password);
-            return (
-              <li key={r.label} className={`flex items-center gap-1 ${ok ? "text-success" : "text-base-content/60"}`}>
-                {ok ? <Check className="size-3" /> : <X className="size-3" />} {r.label}
-              </li>
-            );
-          })}
-        </ul>
-      </fieldset>
+  const fieldError = (key: Field) =>
+    errors[key] && (
+      <p role="alert" className="mt-1 text-xs text-error">
+        {errors[key]}
+      </p>
+    );
 
-      <button type="submit" className="btn btn-primary mt-2 w-full" disabled={submitting}>
-        {submitting && <span className="loading loading-spinner loading-sm" />}
-        Create account
-      </button>
+  return (
+    <div className="space-y-4">
+      <form onSubmit={submit} className="space-y-3" noValidate>
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Name</legend>
+          <label className={`input w-full ${errors.name ? "input-error" : ""}`}>
+            <User className="size-4 opacity-60" />
+            <input className="grow" placeholder="Your name" autoComplete="name" value={form.name} onChange={set("name")} />
+          </label>
+          {fieldError("name")}
+        </fieldset>
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Email</legend>
+          <label className={`input w-full ${errors.email ? "input-error" : ""}`}>
+            <Mail className="size-4 opacity-60" />
+            <input
+              className="grow"
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
+              value={form.email}
+              onChange={set("email")}
+            />
+          </label>
+          {fieldError("email")}
+        </fieldset>
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Photo URL</legend>
+          <label className={`input w-full ${errors.image ? "input-error" : ""}`}>
+            <ImageIcon className="size-4 opacity-60" />
+            <input className="grow" type="url" placeholder="https://…" value={form.image} onChange={set("image")} />
+          </label>
+          {fieldError("image")}
+        </fieldset>
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Password</legend>
+          <PasswordInput
+            placeholder="Create a password"
+            autoComplete="new-password"
+            value={form.password}
+            onChange={set("password")}
+          />
+          <ul className="mt-1 grid gap-1 text-xs sm:grid-cols-3">
+            {RULES.map((r) => {
+              const ok = r.test(form.password);
+              return (
+                <li key={r.label} className={`flex items-center gap-1 ${ok ? "text-success" : "text-base-content/60"}`}>
+                  {ok ? <Check className="size-3" /> : <X className="size-3" />} {r.label}
+                </li>
+              );
+            })}
+          </ul>
+          {fieldError("password")}
+        </fieldset>
+
+        <button type="submit" className="btn btn-primary mt-2 w-full" disabled={submitting}>
+          {submitting && <span className="loading loading-spinner loading-sm" />}
+          Register
+        </button>
+      </form>
+
+      <div className="divider text-xs text-base-content/50">OR</div>
+
+      <GoogleButton redirectTo="/" label="Sign up with Google" />
 
       <p className="text-center text-sm text-base-content/70">
         Already have an account?{" "}
         <Link href={`/login?redirect=${encodeURIComponent(redirect)}`} className="link link-primary">
-          Log in
+          Login
         </Link>
       </p>
-    </form>
+    </div>
   );
 }
