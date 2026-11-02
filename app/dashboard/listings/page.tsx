@@ -47,7 +47,7 @@ export default function MyListingsPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">My studios</h1>
-          <p className="mt-1 text-base-content/70">Spaces you host on SD Studio.</p>
+          <p className="mt-1 text-base-content/70">Spaces you host on StudioSpace.</p>
         </div>
         <Link href="/dashboard/listings/new" className="btn btn-primary">
           <Plus className="size-4" /> Add a studio
