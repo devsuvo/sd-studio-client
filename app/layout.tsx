@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import Providers from "@/components/providers";
+import RouteProgress from "@/components/route-progress";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="flex min-h-screen flex-col">
         <Providers>
+          <RouteProgress />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
