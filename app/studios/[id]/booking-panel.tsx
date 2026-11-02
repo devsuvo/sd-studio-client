@@ -1,7 +1,6 @@
 "use client";
 
-import { CalendarDays, Info, Pencil } from "lucide-react";
-import Link from "next/link";
+import { CalendarDays, Info } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -12,7 +11,8 @@ import { useSession } from "@/lib/auth-client";
 import { formatDate, formatHour, formatMoney, quote, todayString } from "@/lib/format";
 import type { Availability, Booking, Studio } from "@/lib/types";
 
-export default function BookingPanel({ studio }: { studio: Studio }) {
+/** Date + hour picker with live availability and a price breakdown. Rendered inside the booking modal. */
+export default function BookingPanel({ studio, onBooked }: { studio: Studio; onBooked?: () => void }) {
   const router = useRouter();
   const pathname = usePathname();
   const confirm = useConfirm();
@@ -32,7 +32,6 @@ export default function BookingPanel({ studio }: { studio: Studio }) {
     setEnd(null);
   }, [date]);
 
-  const isOwner = session?.user.id === studio.hostId;
   const { openHour, closeHour, minHours } = studio;
   const hours = useMemo(() => Array.from({ length: closeHour - openHour }, (_, i) => openHour + i), [openHour, closeHour]);
 
@@ -78,7 +77,7 @@ export default function BookingPanel({ studio }: { studio: Studio }) {
   };
 
   const selectedHours = start !== null && end !== null ? end - start : 0;
-  const price = quote(studio.hourlyRate, studio.cleaningFee, selectedHours);
+  const price = quote(studio.hourlyRate, studio.securityDeposit, selectedHours);
 
   const submit = async () => {
     if (!session) {
@@ -112,12 +111,13 @@ export default function BookingPanel({ studio }: { studio: Studio }) {
         auth: true,
         body: { studioId: studio._id, date, startHour: start, endHour: end, note },
       });
-      toast.success("Request sent! The host will review it shortly.", {
-        action: { label: "View bookings", onClick: () => router.push("/dashboard/bookings") },
+      toast.success("Booking saved with status Pending. The host will review it shortly.", {
+        action: { label: "My Bookings", onClick: () => router.push("/my-bookings") },
       });
       setStart(null);
       setEnd(null);
       setNote("");
+      onBooked?.();
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -126,30 +126,9 @@ export default function BookingPanel({ studio }: { studio: Studio }) {
     }
   };
 
-  if (isOwner) {
-    return (
-      <aside className="sticky top-24 rounded-box border border-base-300 p-6">
-        <h2 className="text-lg font-semibold">This is your studio</h2>
-        <p className="mt-2 text-sm text-base-content/70">
-          Guests see a booking panel here. You can update details or review incoming requests.
-        </p>
-        <div className="mt-5 flex flex-col gap-2">
-          <Link href={`/dashboard/listings/${studio._id}/edit`} className="btn btn-primary">
-            <Pencil className="size-4" /> Edit listing
-          </Link>
-          <Link href="/dashboard/reservations" className="btn btn-outline">
-            View reservations
-          </Link>
-        </div>
-      </aside>
-    );
-  }
-
   return (
-    <aside className="sticky top-24 rounded-box border border-base-300 bg-base-100 p-6 shadow-sm">
-      <h2 className="text-lg font-semibold">Check availability</h2>
-
-      <fieldset className="fieldset mt-3">
+    <div>
+      <fieldset className="fieldset">
         <legend className="fieldset-legend">Date</legend>
         <label className="input w-full">
           <CalendarDays className="size-4 opacity-60" />
@@ -274,12 +253,12 @@ export default function BookingPanel({ studio }: { studio: Studio }) {
           <span>{formatMoney(price.subtotal)}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-base-content/70">Cleaning fee</span>
-          <span>{formatMoney(selectedHours ? studio.cleaningFee : 0)}</span>
-        </div>
-        <div className="flex justify-between">
           <span className="text-base-content/70">Service fee (5%)</span>
           <span>{formatMoney(price.serviceFee)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-base-content/70">Security deposit (refundable)</span>
+          <span>{formatMoney(selectedHours ? studio.securityDeposit : 0)}</span>
         </div>
         <div className="flex justify-between border-t border-base-300 pt-2 text-base font-semibold">
           <span>Total</span>
@@ -294,9 +273,11 @@ export default function BookingPanel({ studio }: { studio: Studio }) {
         onClick={submit}
       >
         {submitting && <span className="loading loading-spinner loading-sm" />}
-        {session ? "Request booking" : "Log in to book"}
+        {session ? "Confirm booking" : "Log in to book"}
       </button>
-      <p className="mt-2 text-center text-xs text-base-content/60">Sending a request is free. Your slot is held while the host reviews it.</p>
-    </aside>
+      <p className="mt-2 text-center text-xs text-base-content/60">
+        Your booking is saved as Pending and the slot is held while the host reviews it.
+      </p>
+    </div>
   );
 }
