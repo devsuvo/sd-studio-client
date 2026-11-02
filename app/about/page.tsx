@@ -28,7 +28,7 @@ export default function AboutPage() {
     <div className="container-page space-y-20 py-12">
       <section className="grid items-center gap-10 lg:grid-cols-2">
         <div>
-          <h1 className="text-4xl font-bold sm:text-5xl">About StudioSpace</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">About StudioSpace</h1>
           <p className="mt-5 text-lg text-base-content/75">
             Many great studios sit empty for hours each day, while independent creators struggle to find a space that
             fits their shoot and their budget. StudioSpace connects the two.
