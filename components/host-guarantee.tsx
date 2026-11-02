@@ -1,4 +1,5 @@
 import { BadgeCheck, Headset, ShieldCheck, Wrench } from "lucide-react";
+import Reveal from "./reveal";
 
 const ASSURANCES = [
   {
@@ -26,16 +27,16 @@ const ASSURANCES = [
 export default function HostGuarantee() {
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      {ASSURANCES.map((a) => (
-        <div key={a.title} className="flex gap-4 rounded-box border border-base-300 bg-base-100 p-6">
-          <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-secondary/10 text-secondary">
+      {ASSURANCES.map((a, i) => (
+        <Reveal key={a.title} delay={(i % 2) * 90} className="flex h-full gap-5 rounded-box border border-base-300 bg-base-100 p-7 transition duration-300 hover:-translate-y-1 hover:border-secondary/50">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-secondary to-secondary/70 text-secondary-content shadow-lg shadow-secondary/25">
             <a.icon className="size-6" />
           </span>
           <div>
             <h3 className="text-lg font-semibold">{a.title}</h3>
             <p className="mt-1 text-sm text-base-content/70">{a.text}</p>
           </div>
-        </div>
+        </Reveal>
       ))}
     </div>
   );

@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import StudioCard, { StudioCardSkeleton } from "@/components/studio-card";
+import Reveal from "@/components/reveal";
 import { ErrorState } from "@/components/ui";
 import { useFetch } from "@/hooks/use-fetch";
 import { HOME_CATEGORIES } from "@/lib/constants";
@@ -35,14 +36,14 @@ export function StatsStrip() {
 export function CategoryGrid() {
   const { data } = useFetch<Stats>("/api/stats");
   return (
-    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      {HOME_CATEGORIES.map(({ label, category, icon: Icon, blurb }) => {
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      {HOME_CATEGORIES.map(({ label, category, icon: Icon, blurb }, i) => {
         const count = data?.categories[category] ?? 0;
         return (
+          <Reveal key={label} delay={i * 70} className="h-full">
           <Link
-            key={label}
             href={`/studios?category=${encodeURIComponent(category)}`}
-            className="group flex flex-col rounded-box border border-base-300 bg-base-100 p-5 transition hover:-translate-y-1 hover:border-primary hover:shadow-lg"
+            className="group flex h-full flex-col rounded-box border border-base-300 bg-base-100 p-6 transition duration-300 hover:-translate-y-1 hover:border-primary/60 hover:shadow-xl"
           >
             <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-content">
               <Icon className="size-6" />
@@ -54,6 +55,7 @@ export function CategoryGrid() {
               <ArrowRight className="size-4 transition group-hover:translate-x-1 group-hover:text-primary" />
             </p>
           </Link>
+          </Reveal>
         );
       })}
     </div>
@@ -65,17 +67,21 @@ export function FeaturedStudios() {
 
   if (error) {
     return (
-      <div className="mt-8">
+      <div>
         <ErrorState message={error} onRetry={reload} />
       </div>
     );
   }
 
   return (
-    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {loading || !data
         ? Array.from({ length: 6 }, (_, i) => <StudioCardSkeleton key={i} />)
-        : data.map((s) => <StudioCard key={s._id} studio={s} />)}
+        : data.map((s, i) => (
+            <Reveal key={s._id} delay={(i % 3) * 90} className="h-full">
+              <StudioCard studio={s} />
+            </Reveal>
+          ))}
       {!loading && data?.length === 0 && (
         <p className="col-span-full text-base-content/70">
           No studios yet.{" "}

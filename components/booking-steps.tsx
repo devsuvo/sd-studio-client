@@ -1,4 +1,5 @@
 import { CalendarClock, Clapperboard, Search, Zap } from "lucide-react";
+import Reveal from "./reveal";
 
 const STEPS = [
   { icon: Search, title: "Discover Spaces", text: "Search by craft, city, budget and crew size, then compare photos, gear and house rules." },
@@ -11,16 +12,16 @@ export default function BookingSteps() {
   return (
     <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {STEPS.map((s, i) => (
-        <li key={s.title} className="relative rounded-box border border-base-300 bg-base-100 p-6">
+        <Reveal as="li" key={s.title} delay={i * 90} className="relative h-full overflow-hidden rounded-box border border-base-300 bg-base-100 p-7 transition duration-300 hover:-translate-y-1 hover:border-primary/50">
           <span className="absolute right-5 top-4 font-display text-5xl font-bold text-base-content/10">{i + 1}</span>
-          <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
+          <span className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-content shadow-lg shadow-primary/25">
             <s.icon className="size-6" />
           </span>
           <h3 className="mt-4 text-lg font-semibold">
             {i + 1}. {s.title}
           </h3>
           <p className="mt-2 text-sm text-base-content/70">{s.text}</p>
-        </li>
+        </Reveal>
       ))}
     </ol>
   );
