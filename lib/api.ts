@@ -1,4 +1,9 @@
-export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000").replace(/\/+$/, "");
+/**
+ * All API calls go to the same-origin "/backend" path, which next.config.ts forwards to the Express API.
+ * Being same-origin means the browser sends the HttpOnly `ss_token` JWT cookie automatically,
+ * and client code never touches the token.
+ */
+const BASE = "/backend";
 
 export class ApiError extends Error {
   constructor(
@@ -9,49 +14,50 @@ export class ApiError extends Error {
   }
 }
 
-// BetterAuth JWTs live 15 minutes; reuse one for 10 so we don't fetch a token per request.
-let cachedToken: { value: string; expires: number } | null = null;
-
-export function clearTokenCache() {
-  cachedToken = null;
+/** Removes the JWT cookie (logout, or before another account signs in). */
+export async function clearTokenCache() {
+  await fetch("/api/session-token", { method: "DELETE" }).catch(() => undefined);
 }
 
-async function getToken(force: boolean): Promise<string> {
-  if (!force && cachedToken && cachedToken.expires > Date.now()) return cachedToken.value;
-  const res = await fetch("/api/auth/token", { credentials: "include", cache: "no-store" });
-  if (!res.ok) {
-    cachedToken = null;
-    throw new ApiError(401, "Please log in to continue.");
-  }
-  const { token } = (await res.json()) as { token: string };
-  cachedToken = { value: token, expires: Date.now() + 10 * 60 * 1000 };
-  return token;
+let refreshing: Promise<boolean> | null = null;
+
+/** Asks the Next server to mint a fresh JWT cookie from the current BetterAuth session. */
+function refreshTokenCookie(): Promise<boolean> {
+  // Share one refresh between requests that fail at the same moment.
+  refreshing ??= fetch("/api/session-token", { method: "POST", cache: "no-store" })
+    .then((r) => r.ok)
+    .catch(() => false)
+    .finally(() => {
+      refreshing = null;
+    });
+  return refreshing;
 }
 
 interface Options {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   body?: unknown;
+  /** Marks calls to protected routes: on 401 we refresh the cookie once and retry. */
   auth?: boolean;
 }
 
 export async function api<T>(path: string, { method = "GET", body, auth = false }: Options = {}): Promise<T> {
-  const send = async (forceToken: boolean) => {
-    const headers: Record<string, string> = {};
-    if (body !== undefined) headers["Content-Type"] = "application/json";
-    if (auth) headers.Authorization = `Bearer ${await getToken(forceToken)}`;
-    return fetch(`${API_URL}${path}`, {
+  const send = () =>
+    fetch(`${BASE}${path.replace(/^\/api/, "")}`, {
       method,
-      headers,
+      headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
       body: body !== undefined ? JSON.stringify(body) : undefined,
+      credentials: "same-origin",
       cache: "no-store",
     });
-  };
 
   let res: Response;
   try {
-    res = await send(false);
-    // A cached token may have been revoked; retry once with a fresh one.
-    if (auth && res.status === 401) res = await send(true);
+    res = await send();
+    if (auth && res.status === 401) {
+      // No cookie yet, or it expired: mint a new one from the session and try again.
+      if (!(await refreshTokenCookie())) throw new ApiError(401, "Please log in to continue.");
+      res = await send();
+    }
   } catch (err) {
     if (err instanceof ApiError) throw err;
     throw new ApiError(0, "Can't reach the server right now. Check your connection and try again.");

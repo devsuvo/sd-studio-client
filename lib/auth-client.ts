@@ -8,6 +8,6 @@ export const authClient = createAuthClient();
 export const { useSession, signIn, signUp } = authClient;
 
 export async function signOut() {
-  clearTokenCache();
+  await clearTokenCache();
   await authClient.signOut();
 }

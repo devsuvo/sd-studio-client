@@ -11,7 +11,7 @@ export default function GoogleButton({ redirectTo, label = "Continue with Google
 
   const handleClick = async () => {
     setLoading(true);
-    clearTokenCache();
+    await clearTokenCache();
     const { error } = await signIn.social({
       provider: "google",
       callbackURL: redirectTo,

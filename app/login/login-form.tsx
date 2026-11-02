@@ -45,6 +45,7 @@ export default function LoginForm() {
       return;
     }
     setSubmitting(true);
+    await clearTokenCache(); // never reuse another account's API token
     const { error: authError } = await signIn.email({ email: email.trim(), password });
     setSubmitting(false);
     if (authError) {
@@ -54,7 +55,6 @@ export default function LoginForm() {
       toast.error(message);
       return;
     }
-    clearTokenCache();
     toast.success("Logged in. Welcome back!");
     router.replace(redirect);
     router.refresh();
