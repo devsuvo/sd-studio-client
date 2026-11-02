@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: false;
+}
+
+@plugin "daisyui/theme" {
+  name: "studio";
+  default: true;
+  color-scheme: light;
+  --color-base-100: #fffdf9;
+  --color-base-200: #f7f2ea;
+  --color-base-300: #ebe3d6;
+  --color-base-content: #1d1a24;
+  --color-primary: #e8553b;
+  --color-primary-content: #ffffff;
+  --color-secondary: #4338ca;
+  --color-secondary-content: #ffffff;
+  --color-accent: #0f9f8f;
+  --color-accent-content: #ffffff;
+  --color-neutral: #221e2b;
+  --color-neutral-content: #f7f2ea;
+  --color-info: #2563eb;
+  --color-info-content: #ffffff;
+  --color-success: #15803d;
+  --color-success-content: #ffffff;
+  --color-warning: #c27c0e;
+  --color-warning-content: #ffffff;
+  --color-error: #c8323b;
+  --color-error-content: #ffffff;
+  --radius-selector: 0.75rem;
+  --radius-field: 0.6rem;
+  --radius-box: 1rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "studio-dark";
+  prefersdark: true;
+  color-scheme: dark;
+  --color-base-100: #15131b;
+  --color-base-200: #1d1a25;
+  --color-base-300: #2a2634;
+  --color-base-content: #ece7f3;
+  --color-primary: #f26b52;
+  --color-primary-content: #1a0d09;
+  --color-secondary: #8b8cf7;
+  --color-secondary-content: #12122b;
+  --color-accent: #2dd4bf;
+  --color-accent-content: #04201c;
+  --color-neutral: #0d0c12;
+  --color-neutral-content: #ece7f3;
+  --color-info: #60a5fa;
+  --color-info-content: #071a33;
+  --color-success: #4ade80;
+  --color-success-content: #052e12;
+  --color-warning: #fbbf24;
+  --color-warning-content: #2e1d02;
+  --color-error: #f87171;
+  --color-error-content: #2d0707;
+  --radius-selector: 0.75rem;
+  --radius-field: 0.6rem;
+  --radius-box: 1rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-inter), ui-sans-serif, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-base-100 text-base-content antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
