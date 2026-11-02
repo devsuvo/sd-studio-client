@@ -75,7 +75,7 @@ export default function StudioDetailsPage() {
   ];
 
   return (
-    <div className="container-page py-8">
+    <div className="container-page py-8 pb-28 lg:pb-8">
       <Link href="/studios" className="btn btn-ghost btn-sm -ml-3 mb-4">
         <ArrowLeft className="size-4" /> All studios
       </Link>
@@ -174,7 +174,7 @@ export default function StudioDetailsPage() {
 
         {/* Booking summary */}
         <aside>
-          <div className="sticky top-24 rounded-box border border-base-300 bg-base-100 p-6 shadow-sm">
+          <div className="sticky top-24 rounded-box border border-base-300 bg-base-100 p-6 shadow-xl shadow-base-content/5">
             <p>
               <span className="text-3xl font-bold">{formatMoney(studio.hourlyRate)}</span>
               <span className="text-base-content/60"> / hr</span>
@@ -213,6 +213,24 @@ export default function StudioDetailsPage() {
           </div>
         </aside>
       </div>
+
+      {/* Mobile: price + book button stay in reach while scrolling */}
+      {!isOwner && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-base-300 bg-base-100/90 backdrop-blur-xl lg:hidden">
+          <div className="container-page flex items-center justify-between gap-4 py-3">
+            <p>
+              <span className="text-xl font-bold">{formatMoney(studio.hourlyRate)}</span>
+              <span className="text-sm text-base-content/60"> / hr</span>
+              <span className="block text-xs text-base-content/60">
+                Min {studio.minHours}h · {studio.reviewCount > 0 ? `★ ${studio.rating.toFixed(1)}` : "New"}
+              </span>
+            </p>
+            <button className="btn btn-primary" onClick={openBooking}>
+              <CalendarPlus className="size-4" /> Book Now
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Booking modal */}
       <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle" onClose={() => setBookingOpen(false)}>
