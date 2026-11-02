@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, LayoutDashboard, LogOut, Menu, PlusCircle, Warehouse } from "lucide-react";
+import { CalendarCheck, Heart, LayoutDashboard, LogOut, Menu, PlusCircle, Warehouse } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -19,9 +19,10 @@ const LINKS = [
 
 const ACCOUNT_LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/listings/new", label: "Add New Studio", icon: PlusCircle },
-  { href: "/dashboard/listings", label: "My Studio Listings", icon: Warehouse },
-  { href: "/dashboard/bookings", label: "My Bookings", icon: CalendarCheck },
+  { href: "/add-studio", label: "Add New Studio", icon: PlusCircle },
+  { href: "/my-listings", label: "My Studio Listings", icon: Warehouse },
+  { href: "/my-bookings", label: "My Bookings", icon: CalendarCheck },
+  { href: "/saved", label: "Saved Studios", icon: Heart },
 ];
 
 export default function Navbar() {
