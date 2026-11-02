@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "better-auth": "^1.7.15",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.66.0",
     "mongodb": "^7.8.0",
     "next": "^16.4.3",

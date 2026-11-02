@@ -1,34 +1,39 @@
 "use client";
 
-import { CalendarX } from "lucide-react";
+import { CalendarX, FileDown } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import BookingRow from "@/components/booking-row";
 import { useConfirm } from "@/components/confirm-dialog";
-import { EmptyState, ErrorState, Spinner } from "@/components/ui";
+import { EmptyState, ErrorState, PageHeader, Spinner } from "@/components/ui";
 import { useFetch } from "@/hooks/use-fetch";
 import { api } from "@/lib/api";
-import { formatDate, formatHour, todayString } from "@/lib/format";
-import type { Booking } from "@/lib/types";
+import { formatDate, formatHour } from "@/lib/format";
+import type { Booking, BookingStatus } from "@/lib/types";
 
-const TABS = ["upcoming", "past", "cancelled"] as const;
-type Tab = (typeof TABS)[number];
+type Filter = "all" | "pending" | "confirmed" | "completed" | "cancelled";
+
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "pending", label: "Pending" },
+  { value: "confirmed", label: "Confirmed" },
+  { value: "completed", label: "Completed" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+// Declined requests are grouped with cancelled ones.
+const matches = (f: Filter, s: BookingStatus) =>
+  f === "all" || s === f || (f === "cancelled" && s === "declined");
 
 export default function MyBookingsPage() {
   const confirm = useConfirm();
   const { data, setData, error, loading, reload } = useFetch<Booking[]>("/api/bookings/me", { auth: true });
-  const [tab, setTab] = useState<Tab>("upcoming");
+  const [filter, setFilter] = useState<Filter>("all");
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const today = todayString();
-  const groups: Record<Tab, Booking[]> = { upcoming: [], past: [], cancelled: [] };
-  data?.forEach((b) => {
-    if (b.status === "cancelled" || b.status === "declined") groups.cancelled.push(b);
-    else if (b.date >= today) groups.upcoming.push(b);
-    else groups.past.push(b);
-  });
-  groups.upcoming.sort((a, b) => a.date.localeCompare(b.date) || a.startHour - b.startHour);
+  const list = (data ?? []).filter((b) => matches(filter, b.status));
+  const count = (f: Filter) => (data ?? []).filter((b) => matches(f, b.status)).length;
 
   const cancel = async (b: Booking) => {
     const ok = await confirm({
@@ -51,7 +56,7 @@ export default function MyBookingsPage() {
         auth: true,
         body: { status: "cancelled" },
       });
-      setData((list) => list?.map((x) => (x._id === updated._id ? updated : x)) ?? null);
+      setData((all) => all?.map((x) => (x._id === updated._id ? updated : x)) ?? null);
       toast.success("Booking cancelled.");
     } catch (e) {
       toast.error((e as Error).message);
@@ -60,21 +65,30 @@ export default function MyBookingsPage() {
     }
   };
 
+  const invoice = async (b: Booking) => {
+    try {
+      const { downloadInvoice } = await import("@/lib/invoice");
+      await downloadInvoice(b);
+      toast.success("Receipt downloaded.");
+    } catch {
+      toast.error("We couldn't create the PDF. Please try again.");
+    }
+  };
+
   return (
     <div>
-      <h1 className="text-3xl font-bold">My bookings</h1>
-      <p className="mt-1 text-base-content/70">Studios you&apos;ve requested as a creator.</p>
+      <PageHeader title="My Bookings" subtitle="Studios you've reserved as a creator." />
 
-      <div role="tablist" className="tabs tabs-border mt-6">
-        {TABS.map((t) => (
+      <div role="tablist" className="tabs tabs-box w-full flex-nowrap overflow-x-auto sm:w-fit">
+        {FILTERS.map((f) => (
           <button
-            key={t}
+            key={f.value}
             role="tab"
-            className={`tab capitalize ${tab === t ? "tab-active" : ""}`}
-            onClick={() => setTab(t)}
+            className={`tab whitespace-nowrap ${filter === f.value ? "tab-active" : ""}`}
+            onClick={() => setFilter(f.value)}
           >
-            {t === "cancelled" ? "Cancelled / declined" : t}
-            {data && <span className="badge badge-sm ml-2">{groups[t].length}</span>}
+            {f.label}
+            {data && <span className="badge badge-sm ml-2">{count(f.value)}</span>}
           </button>
         ))}
       </div>
@@ -84,39 +98,40 @@ export default function MyBookingsPage() {
           <Spinner label="Loading your bookings" />
         ) : error ? (
           <ErrorState message={error} onRetry={reload} />
-        ) : groups[tab].length === 0 ? (
+        ) : list.length === 0 ? (
           <EmptyState
             icon={CalendarX}
-            title={tab === "upcoming" ? "No upcoming sessions" : `No ${tab} bookings`}
-            message={
-              tab === "upcoming"
-                ? "When you request a studio, it shows up here so you can track the host's response."
-                : "Nothing here yet."
-            }
+            title={filter === "all" ? "No bookings yet" : `No ${filter} bookings`}
+            message="Find a studio that fits your next shoot and reserve it by the hour. Your reservations will show up here."
             action={
-              tab === "upcoming" && (
-                <Link href="/studios" className="btn btn-primary btn-sm">
-                  Find a studio
-                </Link>
-              )
+              <Link href="/studios" className="btn btn-primary btn-sm">
+                Explore Studios
+              </Link>
             }
           />
         ) : (
-          groups[tab].map((b) => (
+          list.map((b) => (
             <BookingRow
               key={b._id}
               booking={b}
               actions={
-                tab === "upcoming" && (
-                  <button
-                    className="btn btn-outline btn-error btn-sm"
-                    disabled={busyId === b._id}
-                    onClick={() => cancel(b)}
-                  >
-                    {busyId === b._id && <span className="loading loading-spinner loading-xs" />}
-                    Cancel booking
-                  </button>
-                )
+                <>
+                  {b.status === "pending" && (
+                    <button
+                      className="btn btn-outline btn-error btn-sm"
+                      disabled={busyId === b._id}
+                      onClick={() => cancel(b)}
+                    >
+                      {busyId === b._id && <span className="loading loading-spinner loading-xs" />}
+                      Cancel Booking
+                    </button>
+                  )}
+                  {(b.status === "confirmed" || b.status === "completed") && (
+                    <button className="btn btn-outline btn-sm" onClick={() => invoice(b)}>
+                      <FileDown className="size-4" /> Download receipt (PDF)
+                    </button>
+                  )}
+                </>
               }
             />
           ))
