@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, LayoutDashboard, LogOut, Menu, Plus, Warehouse } from "lucide-react";
+import { CalendarCheck, LayoutDashboard, LogOut, Menu, PlusCircle, Warehouse } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -13,7 +13,15 @@ import UserAvatar from "./user-avatar";
 const LINKS = [
   { href: "/", label: "Home" },
   { href: "/studios", label: "Explore Studios" },
-  { href: "/dashboard/listings/new", label: "Become a Host" },
+  { href: "/how-it-works", label: "How It Works" },
+  { href: "/about", label: "About Us" },
+];
+
+const ACCOUNT_LINKS = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/listings/new", label: "Add New Studio", icon: PlusCircle },
+  { href: "/dashboard/listings", label: "My Studio Listings", icon: Warehouse },
+  { href: "/dashboard/bookings", label: "My Bookings", icon: CalendarCheck },
 ];
 
 export default function Navbar() {
@@ -23,9 +31,10 @@ export default function Navbar() {
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`));
 
   const handleLogout = async () => {
+    (document.activeElement as HTMLElement | null)?.blur();
     const ok = await confirm({
       title: "Log out?",
       message: "You'll need to sign in again to manage your bookings and studios.",
@@ -38,14 +47,6 @@ export default function Navbar() {
     router.refresh();
   };
 
-  const linkItems = LINKS.map((l) => (
-    <li key={l.href}>
-      <Link href={l.href} className={isActive(l.href) ? "font-semibold text-primary" : ""}>
-        {l.label}
-      </Link>
-    </li>
-  ));
-
   return (
     <header className="sticky top-0 z-40 border-b border-base-300/70 bg-base-100/85 backdrop-blur">
       <nav className="container-page navbar min-h-16 px-0">
@@ -55,14 +56,43 @@ export default function Navbar() {
               <Menu className="size-5" />
             </button>
             <ul tabIndex={0} className="menu dropdown-content z-50 mt-3 w-56 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
-              {linkItems}
+              {LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className={isActive(l.href) ? "menu-active" : ""}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           <Logo />
         </div>
 
         <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal gap-1 px-1">{linkItems}</ul>
+          <ul className="flex items-center gap-6">
+            {LINKS.map((l) => {
+              const active = isActive(l.href);
+              return (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`relative py-2 text-sm font-medium transition hover:text-primary ${
+                      active ? "text-primary" : "text-base-content/80"
+                    }`}
+                  >
+                    {l.label}
+                    {/* Active route indicator */}
+                    <span
+                      className={`absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full bg-primary transition-transform ${
+                        active ? "scale-x-100" : "scale-x-0"
+                      }`}
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </div>
 
         <div className="navbar-end gap-2">
@@ -70,50 +100,39 @@ export default function Navbar() {
           {isPending ? (
             <span className="skeleton size-9 rounded-full" />
           ) : user ? (
-            <div className="dropdown dropdown-end">
+            // Opens on hover (desktop) and on click/tap (touch + keyboard).
+            <div className="dropdown dropdown-end dropdown-hover">
               <button tabIndex={0} className="btn btn-ghost btn-circle" aria-label="Account menu">
                 <UserAvatar name={user.name} image={user.image} />
               </button>
-              <ul tabIndex={0} className="menu dropdown-content z-50 mt-3 w-60 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
-                <li className="menu-title">
-                  <span className="truncate normal-case text-base-content">{user.name}</span>
-                  <span className="truncate text-xs font-normal">{user.email}</span>
-                </li>
-                <li>
-                  <Link href="/dashboard">
-                    <LayoutDashboard className="size-4" /> Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/bookings">
-                    <CalendarCheck className="size-4" /> My bookings
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/listings">
-                    <Warehouse className="size-4" /> My studios
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/listings/new">
-                    <Plus className="size-4" /> List a studio
-                  </Link>
-                </li>
-                <div className="divider my-1" />
-                <li>
-                  <button onClick={handleLogout} className="text-error">
-                    <LogOut className="size-4" /> Log out
-                  </button>
-                </li>
-              </ul>
+              <div tabIndex={0} className="dropdown-content z-50 pt-2">
+                <ul className="menu w-64 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
+                  <li className="pointer-events-none mb-1 border-b border-base-300 px-3 pb-2 pt-1">
+                    <span className="block truncate p-0 font-semibold">{user.name}</span>
+                    <span className="block truncate p-0 text-xs text-base-content/60">{user.email}</span>
+                  </li>
+                  {ACCOUNT_LINKS.map(({ href, label, icon: Icon }) => (
+                    <li key={href}>
+                      <Link href={href} className={pathname === href ? "menu-active" : ""}>
+                        <Icon className="size-4" /> {label}
+                      </Link>
+                    </li>
+                  ))}
+                  <li className="mt-1 border-t border-base-300 pt-1">
+                    <button onClick={handleLogout} className="text-error">
+                      <LogOut className="size-4" /> Logout
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           ) : (
             <>
               <Link href="/login" className="btn btn-ghost btn-sm">
-                Log in
+                Login
               </Link>
               <Link href="/register" className="btn btn-primary btn-sm">
-                Sign up
+                Register
               </Link>
             </>
           )}
