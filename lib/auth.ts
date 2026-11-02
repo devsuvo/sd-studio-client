@@ -9,13 +9,24 @@ const client = new MongoClient(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:2
 const db = client.db(process.env.DB_NAME ?? "studiospace");
 
 export const auth = betterAuth({
-  appName: "SD Studio",
+  appName: "StudioSpace",
   database: mongodbAdapter(db),
   emailAndPassword: {
     enabled: true,
-    minPasswordLength: 8,
-    autoSignIn: true,
+    minPasswordLength: 6,
+    // Registration sends people to the login page instead of signing them in.
+    autoSignIn: false,
   },
+  socialProviders:
+    process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? {
+          google: {
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            prompt: "select_account",
+          },
+        }
+      : undefined,
   session: {
     expiresIn: 60 * 60 * 24 * 7,
     cookieCache: { enabled: true, maxAge: 5 * 60 },
