@@ -89,6 +89,20 @@ h4 {
   letter-spacing: -0.02em;
 }
 
+.hero-slider {
+  --swiper-theme-color: #ffffff;
+  --swiper-navigation-size: 26px;
+  --swiper-pagination-bullet-inactive-color: #ffffff;
+  --swiper-pagination-bullet-inactive-opacity: 0.5;
+}
+
+@media (max-width: 640px) {
+  .hero-slider .swiper-button-prev,
+  .hero-slider .swiper-button-next {
+    display: none;
+  }
+}
+
 .container-page {
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
 }
