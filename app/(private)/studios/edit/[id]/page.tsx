@@ -1,17 +1,17 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import StudioForm from "@/components/studio-form";
-import { ErrorState, Spinner } from "@/components/ui";
+import { EmptyState, ErrorState, PageHeader, Spinner } from "@/components/ui";
 import { useFetch } from "@/hooks/use-fetch";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
 import type { Studio, StudioInput } from "@/lib/types";
 
-export default function EditListingPage() {
+export default function UpdateStudioPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { data: session } = useSession();
@@ -20,8 +20,8 @@ export default function EditListingPage() {
   const save = async (data: StudioInput) => {
     try {
       await api<Studio>(`/api/studios/${id}`, { method: "PATCH", auth: true, body: data });
-      toast.success("Changes saved.");
-      router.push("/dashboard/listings");
+      toast.success("Studio updated successfully.");
+      router.push("/my-listings");
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -29,18 +29,28 @@ export default function EditListingPage() {
 
   if (loading) return <Spinner label="Loading listing" />;
   if (error || !studio) return <ErrorState message={error ?? "This listing couldn't be loaded."} onRetry={reload} />;
-  if (session && studio.hostId !== session.user.id) {
-    return <ErrorState message="Only the host of this studio can edit it." />;
+  if (session && studio.ownerEmail !== session.user.email) {
+    return (
+      <EmptyState
+        icon={ShieldAlert}
+        title="You can't edit this studio"
+        message="Only the host who listed this studio can update it."
+        action={
+          <Link href="/my-listings" className="btn btn-primary btn-sm">
+            Go to My Studio Listings
+          </Link>
+        }
+      />
+    );
   }
 
   return (
     <div>
-      <Link href="/dashboard/listings" className="btn btn-ghost btn-sm -ml-3">
-        <ArrowLeft className="size-4" /> My studios
+      <Link href="/my-listings" className="btn btn-ghost btn-sm -ml-3 mb-2">
+        <ArrowLeft className="size-4" /> My Studio Listings
       </Link>
-      <h1 className="mt-2 text-3xl font-bold">Edit studio</h1>
-      <p className="mb-6 mt-1 text-base-content/70">{studio.title}</p>
-      <StudioForm initial={studio} submitLabel="Save changes" onSubmit={save} />
+      <PageHeader title="Update Studio" subtitle={studio.title} />
+      <StudioForm initial={studio} submitLabel="Save Changes" onSubmit={save} />
     </div>
   );
 }

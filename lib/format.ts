@@ -29,9 +29,9 @@ export function todayString() {
 
 export const SERVICE_FEE_RATE = 0.05;
 
-export function quote(hourlyRate: number, cleaningFee: number, hours: number) {
+export function quote(hourlyRate: number, securityDeposit: number, hours: number) {
   const round = (n: number) => Math.round(n * 100) / 100;
   const subtotal = round(hourlyRate * hours);
   const serviceFee = round(subtotal * SERVICE_FEE_RATE);
-  return { subtotal, cleaningFee, serviceFee, total: round(subtotal + cleaningFee + serviceFee) };
+  return { subtotal, securityDeposit, serviceFee, total: round(subtotal + securityDeposit + serviceFee) };
 }

@@ -19,6 +19,16 @@ export const HOME_CATEGORIES: { label: string; category: Category; icon: LucideI
   { label: "Art Workshops", category: "Art Workshop", icon: Palette, blurb: "Easels, wheels, kilns and natural light" },
 ];
 
+/** Names shown in the Add/Edit studio category select. */
+export const CATEGORY_LABELS: Record<Category, string> = {
+  Photography: "Photo Studio",
+  "Film & Video": "Film Stage",
+  Podcast: "Podcast Lounge",
+  "Music Recording": "Music Suite",
+  "Art Workshop": "Workshop",
+  "Dance & Rehearsal": "Dance & Rehearsal Hall",
+};
+
 export const AMENITY_SUGGESTIONS = [
   "Wi-Fi",
   "Air conditioning",

@@ -14,7 +14,7 @@ export interface Studio {
   city: string;
   address: string;
   hourlyRate: number;
-  cleaningFee: number;
+  securityDeposit: number;
   capacity: number;
   sizeSqft: number;
   minHours: number;
@@ -25,8 +25,8 @@ export interface Studio {
   images: string[];
   rules: string;
   hostId: string;
-  hostName: string;
-  hostEmail: string;
+  ownerName: string;
+  ownerEmail: string;
   rating: number;
   reviewCount: number;
   createdAt: string;
@@ -34,7 +34,7 @@ export interface Studio {
 
 export type StudioInput = Omit<
   Studio,
-  "_id" | "hostId" | "hostName" | "hostEmail" | "rating" | "reviewCount" | "createdAt"
+  "_id" | "hostId" | "ownerName" | "ownerEmail" | "rating" | "reviewCount" | "createdAt"
 >;
 
 export interface StudioPage {
@@ -44,7 +44,7 @@ export interface StudioPage {
   pages: number;
 }
 
-export type BookingStatus = "pending" | "confirmed" | "declined" | "cancelled";
+export type BookingStatus = "pending" | "confirmed" | "completed" | "declined" | "cancelled";
 
 export interface Booking {
   _id: string;
@@ -58,7 +58,7 @@ export interface Booking {
   startHour: number;
   endHour: number;
   hours: number;
-  pricing: { hourlyRate: number; subtotal: number; cleaningFee: number; serviceFee: number; total: number };
+  pricing: { hourlyRate: number; subtotal: number; securityDeposit: number; serviceFee: number; total: number };
   note: string;
   status: BookingStatus;
   createdAt: string;
@@ -88,4 +88,15 @@ export interface Stats {
   hosts: number;
   bookings: number;
   categories: Record<string, number>;
+}
+
+export interface Review {
+  _id: string;
+  studioId: string;
+  userId: string;
+  userName: string;
+  userImage: string | null;
+  rating: number;
+  comment: string;
+  createdAt: string;
 }

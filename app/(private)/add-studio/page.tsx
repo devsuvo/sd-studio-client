@@ -3,19 +3,18 @@
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import StudioForm from "@/components/studio-form";
+import { PageHeader } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { Studio, StudioInput } from "@/lib/types";
 
-export default function NewListingPage() {
+export default function AddStudioPage() {
   const router = useRouter();
 
   const create = async (data: StudioInput) => {
     try {
-      const studio = await api<Studio>("/api/studios", { method: "POST", auth: true, body: data });
-      toast.success("Your studio is live!", {
-        action: { label: "View listing", onClick: () => router.push(`/studios/${studio._id}`) },
-      });
-      router.push("/dashboard/listings");
+      await api<Studio>("/api/studios", { method: "POST", auth: true, body: data });
+      toast.success("Studio added! It's now live in Explore Studios.");
+      router.push("/my-listings");
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -23,11 +22,11 @@ export default function NewListingPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">List a studio</h1>
-      <p className="mb-6 mt-1 text-base-content/70">
-        Clear photos, gear and hours help creators book with confidence.
-      </p>
-      <StudioForm submitLabel="Publish studio" onSubmit={create} />
+      <PageHeader
+        title="Add New Studio"
+        subtitle="Clear photos, amenities and pricing help creators book with confidence."
+      />
+      <StudioForm submitLabel="Add Studio" onSubmit={create} />
     </div>
   );
 }
