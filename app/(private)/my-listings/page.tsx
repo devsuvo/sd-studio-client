@@ -6,10 +6,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/confirm-dialog";
 import StudioImage from "@/components/studio-image";
-import { EmptyState, ErrorState, Spinner } from "@/components/ui";
+import { EmptyState, ErrorState, PageHeader, Spinner } from "@/components/ui";
 import { useFetch } from "@/hooks/use-fetch";
 import { api } from "@/lib/api";
-import { formatHour, formatMoney } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import type { Studio } from "@/lib/types";
 
 export default function MyListingsPage() {
@@ -25,7 +25,7 @@ export default function MyListingsPage() {
       cancelText: "Keep it",
       message: (
         <>
-          <strong>{studio.title}</strong> will be removed from search right away. This can&apos;t be undone.
+          <strong>{studio.title}</strong> will be permanently removed from StudioSpace. This can&apos;t be undone.
         </>
       ),
     });
@@ -42,73 +42,111 @@ export default function MyListingsPage() {
     }
   };
 
+  const actions = (s: Studio) => (
+    <div className="flex flex-wrap gap-2">
+      <Link href={`/studios/${s._id}`} className="btn btn-ghost btn-sm" aria-label={`View ${s.title}`}>
+        <Eye className="size-4" />
+      </Link>
+      <Link href={`/studios/edit/${s._id}`} className="btn btn-outline btn-sm">
+        <Pencil className="size-4" /> Update
+      </Link>
+      <button className="btn btn-outline btn-error btn-sm" onClick={() => remove(s)} disabled={deleting === s._id}>
+        {deleting === s._id ? <span className="loading loading-spinner loading-xs" /> : <Trash2 className="size-4" />}
+        Delete
+      </button>
+    </div>
+  );
+
+  const rating = (s: Studio) => (
+    <span className="inline-flex items-center gap-1">
+      <Star className="size-4 fill-warning text-warning" />
+      {s.reviewCount > 0 ? `${s.rating.toFixed(1)} (${s.reviewCount})` : "New"}
+    </span>
+  );
+
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">My studios</h1>
-          <p className="mt-1 text-base-content/70">Spaces you host on StudioSpace.</p>
-        </div>
-        <Link href="/dashboard/listings/new" className="btn btn-primary">
-          <Plus className="size-4" /> Add a studio
-        </Link>
-      </div>
+      <PageHeader
+        title="My Studio Listings"
+        subtitle="Spaces you host on StudioSpace."
+        action={
+          <Link href="/add-studio" className="btn btn-primary">
+            <Plus className="size-4" /> Add New Studio
+          </Link>
+        }
+      />
 
-      <div className="mt-6">
-        {loading ? (
-          <Spinner label="Loading your studios" />
-        ) : error ? (
-          <ErrorState message={error} onRetry={reload} />
-        ) : !data?.length ? (
-          <EmptyState
-            icon={Warehouse}
-            title="You haven't listed a studio yet"
-            message="Share your space with photographers, filmmakers, podcasters and musicians nearby."
-            action={
-              <Link href="/dashboard/listings/new" className="btn btn-primary btn-sm">
-                List your first studio
-              </Link>
-            }
-          />
-        ) : (
-          <div className="grid gap-4">
+      {loading ? (
+        <Spinner label="Loading your studios" />
+      ) : error ? (
+        <ErrorState message={error} onRetry={reload} />
+      ) : !data?.length ? (
+        <EmptyState
+          icon={Warehouse}
+          title="You haven't listed a studio yet"
+          message="Share your space with photographers, filmmakers, podcasters and musicians nearby."
+          action={
+            <Link href="/add-studio" className="btn btn-primary btn-sm">
+              List your first studio
+            </Link>
+          }
+        />
+      ) : (
+        <>
+          {/* Desktop: table */}
+          <div className="hidden overflow-x-auto rounded-box border border-base-300 md:block">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Studio</th>
+                  <th>Category</th>
+                  <th>Rate</th>
+                  <th>Rating</th>
+                  <th className="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((s) => (
+                  <tr key={s._id}>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <StudioImage src={s.images[0]} alt={s.title} className="h-14 w-20 shrink-0 rounded-lg" />
+                        <div className="min-w-0">
+                          <p className="line-clamp-1 font-semibold">{s.title}</p>
+                          <p className="text-xs text-base-content/60">{s.city}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="badge badge-outline badge-sm whitespace-nowrap">{s.category}</span>
+                    </td>
+                    <td className="whitespace-nowrap">{formatMoney(s.hourlyRate)} / hr</td>
+                    <td className="whitespace-nowrap">{rating(s)}</td>
+                    <td>
+                      <div className="flex justify-end">{actions(s)}</div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: cards */}
+          <div className="grid gap-4 md:hidden">
             {data.map((s) => (
-              <article key={s._id} className="flex flex-col gap-4 rounded-box border border-base-300 p-4 sm:flex-row">
-                <StudioImage src={s.images[0]} alt={s.title} className="h-40 w-full shrink-0 rounded-xl sm:h-28 sm:w-40" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-semibold">{s.title}</h2>
-                    <span className="badge badge-sm badge-outline">{s.category}</span>
-                  </div>
-                  <p className="mt-1 text-sm text-base-content/60">
-                    {s.city} · {formatMoney(s.hourlyRate)}/hr · {formatHour(s.openHour)} – {formatHour(s.closeHour)}
-                  </p>
-                  <p className="mt-1 flex items-center gap-1 text-sm">
-                    <Star className="size-4 fill-warning text-warning" />
-                    {s.reviewCount > 0 ? `${s.rating.toFixed(1)} · ${s.reviewCount} reviews` : "No reviews yet"}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Link href={`/studios/${s._id}`} className="btn btn-ghost btn-sm">
-                      <Eye className="size-4" /> View
-                    </Link>
-                    <Link href={`/dashboard/listings/${s._id}/edit`} className="btn btn-outline btn-sm">
-                      <Pencil className="size-4" /> Edit
-                    </Link>
-                    <button
-                      className="btn btn-outline btn-error btn-sm"
-                      onClick={() => remove(s)}
-                      disabled={deleting === s._id}
-                    >
-                      {deleting === s._id ? <span className="loading loading-spinner loading-xs" /> : <Trash2 className="size-4" />}
-                      Delete
-                    </button>
-                  </div>
-                </div>
+              <article key={s._id} className="rounded-box border border-base-300 p-4">
+                <StudioImage src={s.images[0]} alt={s.title} className="aspect-[16/9] w-full rounded-xl" />
+                <h2 className="mt-3 font-semibold">{s.title}</h2>
+                <p className="mt-1 text-sm text-base-content/60">
+                  {s.category} · {s.city} · {formatMoney(s.hourlyRate)} / hr
+                </p>
+                <p className="mt-1 text-sm">{rating(s)}</p>
+                <div className="mt-3">{actions(s)}</div>
               </article>
             ))}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }
